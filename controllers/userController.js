@@ -1,5 +1,6 @@
 const User = require("../models/userSchema");
 const { generateAlias, generateCvu } = require("../helpers/generators");
+const Balance = require("../models/balanceSchema");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -32,10 +33,14 @@ const registerUser = async (req, res) => {
 
     const newUser = new User({ name, lastname, email, password, alias, cvu });
     await newUser.save();
+
+    const balance = new Balance({ user: newUser._id });
+    await balance.save();
+
     res.status(201).json({
       status: 201,
       message: "User created successfully",
-      data: newUser,
+      user: newUser,
     });
   } catch (error) {
     res.status(500).json({
