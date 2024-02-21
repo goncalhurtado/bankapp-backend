@@ -1,4 +1,5 @@
 const User = require("../models/userSchema");
+const { generateAlias, generateCvu } = require("../helpers/generators");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -26,7 +27,10 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const newUser = new User({ name, lastname, email, password });
+    const alias = generateAlias(name, lastname);
+    const cvu = generateCvu(email);
+
+    const newUser = new User({ name, lastname, email, password, alias, cvu });
     await newUser.save();
     res.status(201).json({
       status: 201,
@@ -42,4 +46,28 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, registerUser };
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: 200,
+      message: "User deleted successfully",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { getAllUsers, registerUser, deleteUser };
