@@ -1,5 +1,6 @@
 const User = require("../models/userSchema");
 const { generateAlias, generateCvu } = require("../helpers/generators");
+const Balance = require("../models/balanceSchema");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -32,10 +33,14 @@ const registerUser = async (req, res) => {
 
     const newUser = new User({ name, lastname, email, password, alias, cvu });
     await newUser.save();
+
+    const balance = new Balance({ user: newUser._id });
+    await balance.save();
+
     res.status(201).json({
       status: 201,
       message: "User created successfully",
-      data: newUser,
+      user: newUser,
     });
   } catch (error) {
     res.status(500).json({
@@ -59,7 +64,28 @@ const deleteUser = async (req, res) => {
     res.status(200).json({
       status: 200,
       message: "User deleted successfully",
-      data: user,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+//testing
+
+const createBalanceById = async (req, res) => {
+  const { user } = req.params;
+
+  try {
+    const balance = new Balance({ user: user });
+    await balance.save();
+    res.status(201).json({
+      status: 201,
+      message: "Balance created successfully",
+      balance,
     });
   } catch (error) {
     res.status(500).json({
@@ -70,4 +96,9 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, registerUser, deleteUser };
+module.exports = {
+  getAllUsers,
+  registerUser,
+  deleteUser,
+  createBalanceById,
+};
