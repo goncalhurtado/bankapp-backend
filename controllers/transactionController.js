@@ -1,10 +1,28 @@
 const Transaction = require("../models/transactionSchema");
 const User = require("../models/userSchema");
 const Balance = require("../models/balanceSchema");
+const mongoose = require("mongoose");
 
 const makeTransaction = async (req, res) => {
   const { origin, destination, amount, notes } = req.body;
+
+  if (amount <= 0) {
+    return res.status(400).json({
+      status: 400,
+      message: "Amount must be greater than 0",
+    });
+  }
+
   try {
+    if (
+      !mongoose.Types.ObjectId.isValid(origin) ||
+      !mongoose.Types.ObjectId.isValid(destination)
+    ) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid id",
+      });
+    }
     const userOrigin = await User.findById(origin);
     if (!userOrigin) {
       return res.status(404).json({
