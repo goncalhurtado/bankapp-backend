@@ -89,4 +89,39 @@ const makeTransaction = async (req, res) => {
   }
 };
 
-module.exports = { makeTransaction };
+const getTransactionsByUser = async (req, res) => {
+  const { user } = req.params;
+  const { page = 1, limit = 15 } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    const totalTransactions = await Transaction.countDocuments({
+      $or: [{ origin: user }, { destination: user }],
+    });
+
+    const totalPages = Math.ceil(totalTransactions / limit);
+    const isLastPage = page >= totalPages;
+
+    const transactions = await Transaction.find({
+      $or: [{ origin: user }, { destination: user }],
+    })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      status: 200,
+      message: "Transactions found",
+      transactions,
+      totalPages,
+      isLastPage,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { makeTransaction, getTransactionsByUser };

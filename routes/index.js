@@ -5,7 +5,10 @@ const {
   deleteUser,
   createBalanceById,
 } = require("../controllers/userController");
-const { makeTransaction } = require("../controllers/transactionController");
+const {
+  makeTransaction,
+  getTransactionsByUser,
+} = require("../controllers/transactionController");
 const {
   getBalanceAmount,
   getAllBalances,
@@ -17,10 +20,13 @@ const {
 router.get("/users", getAllUsers);
 router.post("/user", registerUser);
 router.delete("/user/:id", deleteUser);
+
+//test
 router.post("/balance/:user", createBalanceById);
 
 // Transaction routes
 router.post("/transaction", makeTransaction);
+router.get("/transactions/:user", getTransactionsByUser); //page and limit on query
 
 // Balance routes
 router.get("/balance/:user", getBalanceAmount);
