@@ -14,13 +14,10 @@ const makeTransaction = async (req, res) => {
   }
 
   try {
-    if (
-      !mongoose.Types.ObjectId.isValid(origin) ||
-      !mongoose.Types.ObjectId.isValid(destination)
-    ) {
+    if (!mongoose.Types.ObjectId.isValid(origin)) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid id",
+        message: "Invalid origin id",
       });
     }
     const userOrigin = await User.findById(origin);
@@ -30,13 +27,23 @@ const makeTransaction = async (req, res) => {
         message: "Origin user not found",
       });
     }
-    const userDestination = await User.findById(destination);
-    if (!userDestination) {
+
+    //get destination user by alias or cvu
+
+    const destinationUser = await User.findOne({
+      $or: [{ alias: destination }, { cvu: destination }],
+    });
+
+    const destinationId = destinationUser._id;
+
+    if (!destinationUser) {
       return res.status(404).json({
         status: 404,
         message: "Destination user not found",
       });
     }
+
+    //check if origin user has enough funds
 
     const checkOriginAcount = await Balance.findOne({ user: origin });
     if (checkOriginAcount.balance <= amount) {
@@ -46,27 +53,33 @@ const makeTransaction = async (req, res) => {
       });
     }
 
-    const originBalance = await Balance.findOneAndUpdate(
-      { user: origin },
-      { $inc: { balance: -amount } },
-      { new: true }
-    );
-    const destinationBalance = await Balance.findOneAndUpdate(
-      { user: destination },
-      { $inc: { balance: amount } },
-      { new: true }
-    );
+    // create transaction
 
-    const transaction = new Transaction({ origin, destination, amount, notes });
+    const transaction = new Transaction({
+      origin,
+      destination: destinationId,
+      amount,
+      notes,
+    });
 
     await transaction.save();
     res.status(201).json({
       status: 201,
       message: "Transaction created successfully",
       transaction,
-      originBalance,
-      destinationBalance,
     });
+
+    // update balances
+    const originBalance = await Balance.findOneAndUpdate(
+      { user: origin },
+      { $inc: { balance: -amount } },
+      { new: true }
+    );
+    const destinationBalance = await Balance.findOneAndUpdate(
+      { user: destinationId },
+      { $inc: { balance: amount } },
+      { new: true }
+    );
   } catch (error) {
     res.status(500).json({
       status: 500,
