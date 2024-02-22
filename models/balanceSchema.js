@@ -5,9 +5,9 @@ const balanceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  amount: {
+  balance: {
     type: Number,
-    default: 1000,
+    default: 1000, // for testing purposes
   },
   currency: {
     type: String,
