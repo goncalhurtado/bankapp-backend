@@ -11,12 +11,12 @@ const getBalanceAmount = async (req, res) => {
       });
     }
 
-    const balanceAmount = balance.amount;
+    const balanceAmount = balance.balance;
 
     res.status(200).json({
       status: 200,
       message: "Balance found",
-      balanceAmount,
+      data: balanceAmount,
     });
   } catch (error) {
     res.status(500).json({
