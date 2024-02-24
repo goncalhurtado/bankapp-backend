@@ -105,6 +105,8 @@ const getTransactionsByUser = async (req, res) => {
     const transactions = await Transaction.find({
       $or: [{ origin: user }, { destination: user }],
     })
+      .populate("origin", "name lastname")
+      .populate("destination", "name lastname")
       .skip(skip)
       .limit(limit);
 

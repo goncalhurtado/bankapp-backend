@@ -16,7 +16,7 @@ const getBalanceAmount = async (req, res) => {
     res.status(200).json({
       status: 200,
       message: "Balance found",
-      data: balanceAmount,
+      balanceAmount,
     });
   } catch (error) {
     res.status(500).json({

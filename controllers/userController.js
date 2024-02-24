@@ -74,6 +74,31 @@ const deleteUser = async (req, res) => {
     });
   }
 };
+
+const getUserByCvuOrAlias = async (req, res) => {
+  const { destination } = req.params;
+  console.log(destination, "param");
+  try {
+    const destinationUser = await User.findOne({
+      $or: [{ alias: destination }, { cvu: destination }],
+    });
+    //chequear cual codigo corresponde
+    if (!destinationUser) {
+      return res.status(200).json({
+        status: 200,
+        message: "Destination user not found",
+        destinationUser: false,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 //testing
 
 const createBalanceById = async (req, res) => {
@@ -101,4 +126,5 @@ module.exports = {
   registerUser,
   deleteUser,
   createBalanceById,
+  getUserByCvuOrAlias,
 };

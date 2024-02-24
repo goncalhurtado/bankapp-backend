@@ -4,6 +4,7 @@ const {
   registerUser,
   deleteUser,
   createBalanceById,
+  getUserByCvuOrAlias,
 } = require("../controllers/userController");
 const {
   makeTransaction,
@@ -20,6 +21,7 @@ const {
 router.get("/users", getAllUsers);
 router.post("/user", registerUser);
 router.delete("/user/:id", deleteUser);
+router.get("/checkDestination/:destination", getUserByCvuOrAlias);
 
 //test
 router.post("/balance/:user", createBalanceById);
