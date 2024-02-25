@@ -30,18 +30,18 @@ const makeTransaction = async (req, res) => {
 
     //get destination user by alias or cvu
 
-    const destinationUser = await User.findOne({
-      $or: [{ alias: destination }, { cvu: destination }],
-    });
+    // const destinationUser = await User.findOne({
+    //   $or: [{ alias: destination }, { cvu: destination }],
+    // });
 
-    const destinationId = destinationUser._id;
+    // const destinationId = destinationUser._id;
 
-    if (!destinationUser) {
-      return res.status(404).json({
-        status: 404,
-        message: "Destination user not found",
-      });
-    }
+    // if (!destinationUser) {
+    //   return res.status(404).json({
+    //     status: 404,
+    //     message: "Destination user not found",
+    //   });
+    // }
 
     //check if origin user has enough funds
 
@@ -57,16 +57,21 @@ const makeTransaction = async (req, res) => {
 
     const transaction = new Transaction({
       origin,
-      destination: destinationId,
+      destination,
       amount,
       notes,
     });
 
     await transaction.save();
+
+    const newTransaction = await Transaction.findById(transaction._id)
+      .populate("origin", "name lastname")
+      .populate("destination", "name lastname");
+
     res.status(201).json({
       status: 201,
       message: "Transaction created successfully",
-      transaction,
+      newTransaction,
     });
 
     // update balances
@@ -76,7 +81,7 @@ const makeTransaction = async (req, res) => {
       { new: true }
     );
     const destinationBalance = await Balance.findOneAndUpdate(
-      { user: destinationId },
+      { user: destination },
       { $inc: { balance: amount } },
       { new: true }
     );
@@ -105,6 +110,9 @@ const getTransactionsByUser = async (req, res) => {
     const transactions = await Transaction.find({
       $or: [{ origin: user }, { destination: user }],
     })
+      .populate("origin", "name lastname")
+      .populate("destination", "name lastname")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

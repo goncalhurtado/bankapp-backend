@@ -1,6 +1,7 @@
 const User = require("../models/userSchema");
 const { generateAlias, generateCvu } = require("../helpers/generators");
 const Balance = require("../models/balanceSchema");
+const mongoose = require("mongoose");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -74,6 +75,40 @@ const deleteUser = async (req, res) => {
     });
   }
 };
+
+const getUserByCvuOrAlias = async (req, res) => {
+  const { destination } = req.params;
+
+  try {
+    const destinationUser = await User.findOne({
+      $or: [{ alias: destination }, { cvu: destination }],
+    });
+    //chequear cual codigo corresponde
+    if (!destinationUser) {
+      return res.status(404).json({
+        status: 404,
+        message: "Destination user not found",
+        destinationUser: false,
+      });
+    }
+    res.status(200).json({
+      status: 200,
+      message: "Destination user found",
+      destinationUser: {
+        name: destinationUser.name,
+        lastname: destinationUser.lastname,
+        _id: destinationUser._id,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 //testing
 
 const createBalanceById = async (req, res) => {
@@ -101,4 +136,5 @@ module.exports = {
   registerUser,
   deleteUser,
   createBalanceById,
+  getUserByCvuOrAlias,
 };

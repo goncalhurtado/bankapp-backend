@@ -11,7 +11,7 @@ const getBalanceAmount = async (req, res) => {
       });
     }
 
-    const balanceAmount = balance.amount;
+    const balanceAmount = balance.balance;
 
     res.status(200).json({
       status: 200,
