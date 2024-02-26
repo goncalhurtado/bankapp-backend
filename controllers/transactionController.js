@@ -1,6 +1,7 @@
 const Transaction = require("../models/transactionSchema");
 const User = require("../models/userSchema");
 const Balance = require("../models/balanceSchema");
+const Contact = require("../models/contactSchema");
 const mongoose = require("mongoose");
 
 const makeTransaction = async (req, res) => {
@@ -27,21 +28,6 @@ const makeTransaction = async (req, res) => {
         message: "Origin user not found",
       });
     }
-
-    //get destination user by alias or cvu
-
-    // const destinationUser = await User.findOne({
-    //   $or: [{ alias: destination }, { cvu: destination }],
-    // });
-
-    // const destinationId = destinationUser._id;
-
-    // if (!destinationUser) {
-    //   return res.status(404).json({
-    //     status: 404,
-    //     message: "Destination user not found",
-    //   });
-    // }
 
     //check if origin user has enough funds
 
@@ -85,6 +71,42 @@ const makeTransaction = async (req, res) => {
       { $inc: { balance: amount } },
       { new: true }
     );
+
+    // save contact
+    const contactList = await Contact.findOne({ user: origin });
+
+    if (contactList) {
+      const contactExists = contactList.contacts.find(
+        (contact) => contact.user.toString() === destination
+      );
+
+      if (!contactExists) {
+        await Contact.findOneAndUpdate(
+          { user: origin },
+          {
+            $push: {
+              contacts: {
+                user: destination,
+                lastTransaction: new Date(),
+              },
+            },
+          }
+        );
+      }
+    } else {
+      await Contact.findOneAndUpdate(
+        { user: origin },
+        {
+          $push: {
+            contacts: {
+              user: destination,
+              lastTransaction: new Date(),
+            },
+          },
+        },
+        { upsert: true } // Crea un nuevo documento si no se encuentra ninguna coincidencia
+      );
+    }
   } catch (error) {
     res.status(500).json({
       status: 500,
