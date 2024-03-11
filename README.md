@@ -32,23 +32,18 @@ Also, include the cluster name from your MongoDB database.
 - `GET /checkDestination/:destination` - Get user by CVU or alias.
 - `POST /login` - User login.
 
-### Test
-- `POST /balance/:user` - Create balance by user ID.
-
-### Transaction Routes
+### Transaction 
 - `POST /transaction` - Make a transaction.
 - `GET /transactions/:user` - Get transactions by user. (Supports pagination with 'page' and 'limit' parameters)
 
-### Balance Routes
+### Balance 
 - `GET /balance/:user` - Get balance amount by user.
 - `GET /balances` - Retrieve all balances.
 - `DELETE /balances/all` - Delete all balance accounts.
 
-### Contact Routes
+### Contact 
 - `GET /contacts/:user` - Get contacts by user.
 
-### Booking Routes
-- `GET /bookings/all` - Retrieve all bookings. (Authenticated)
 
 
 ## Main Technologies
