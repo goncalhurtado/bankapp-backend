@@ -9,7 +9,7 @@ Check out the  [Frontend repository](https://github.com/goncalhurtado/banking-ap
 
 ```
 git clone https://github.com/goncalhurtado/bankapp-backend
-cd hotel-software-backend
+cd bankapp-backend
 npm install
 ```
 
