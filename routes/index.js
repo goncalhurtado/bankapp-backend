@@ -5,6 +5,7 @@ const {
   deleteUser,
   createBalanceById,
   getUserByCvuOrAlias,
+  login,
 } = require("../controllers/userController");
 const {
   makeTransaction,
@@ -15,6 +16,7 @@ const {
   getAllBalances,
   deleteAllBalancesAcount,
 } = require("../controllers/balanceController");
+const { getContactsByUser } = require("../controllers/contactController");
 
 // User routes
 
@@ -22,6 +24,7 @@ router.get("/users", getAllUsers);
 router.post("/user", registerUser);
 router.delete("/user/:id", deleteUser);
 router.get("/checkDestination/:destination", getUserByCvuOrAlias);
+router.post("/login", login);
 
 //test
 router.post("/balance/:user", createBalanceById);
@@ -34,5 +37,8 @@ router.get("/transactions/:user", getTransactionsByUser); //page and limit on qu
 router.get("/balance/:user", getBalanceAmount);
 router.get("/balances", getAllBalances);
 router.delete("/balances/all", deleteAllBalancesAcount);
+
+// Contact routes
+router.get("/contacts/:user", getContactsByUser);
 
 module.exports = router;

@@ -111,6 +111,49 @@ const getUserByCvuOrAlias = async (req, res) => {
 
 //testing
 
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: "Email not found",
+      });
+    }
+
+    if (user.password !== password) {
+      return res.status(400).json({
+        status: 400,
+        message: "Incorrect password",
+      });
+    }
+
+    const userResponse = {
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+      alias: user.alias,
+      cvu: user.cvu,
+      _id: user._id,
+    };
+
+    res.status(200).json({
+      status: 200,
+      message: "User found",
+      user: userResponse,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 const createBalanceById = async (req, res) => {
   const { user } = req.params;
 
@@ -137,4 +180,5 @@ module.exports = {
   deleteUser,
   createBalanceById,
   getUserByCvuOrAlias,
+  login,
 };
